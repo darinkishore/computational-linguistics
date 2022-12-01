@@ -57,6 +57,7 @@ def tokenize_strmat_0(text):
     return new_tokens
 
 
+
 def tokenize_strmat_1(text):
     tokens = text.split()
     new_tokens = []
@@ -114,3 +115,4 @@ if __name__ == '__main__':
 
     print(tokenize_regex(text0))
     print(tokenize_regex(text1))
+

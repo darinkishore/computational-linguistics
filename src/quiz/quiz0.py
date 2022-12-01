@@ -24,4 +24,3 @@ for sentence in sentences:
     print(sentence.tokens)
     print(sentence.offsets)
 
-
