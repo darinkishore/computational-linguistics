@@ -163,39 +163,25 @@ def predict(tokens: List[str], *args) -> List[Tuple[str, float]]:
 
     # trellis dict with tokens
     trellis = {state: {token: 0 for token in tokens} for state in parts_of_speech}
-    trellis = pd.DataFrame(trellis)
     backpointer = {state: {token: 0 for token in tokens} for state in parts_of_speech}
-    backpointer = pd.DataFrame(backpointer)
+
+    # maybe we can try doing this with dicts instead of dataframes
 
     # initialize trellis
-    for state in parts_of_speech:
-        # if the word is not in the training data, it's a rare word so set it to the most likely tag
-        # if tokens[0] not in words:
-            # trellis.loc[state, tokens[0]] = transition_matrix.loc['.', state] * emission_matrix.loc[state, 'NN']
-        # else:
-        trellis.loc[state, tokens[0]] = transition_matrix.loc['.', state] * emission_matrix.loc[tokens[0], state]
-        backpointer.loc[state, tokens[0]] = '.'
-
-
-    for observation in range(1, len(tokens)):
+    for token in tokens:
         for state in parts_of_speech:
-            # if the token is not in the emission matrix, it's a rare word, so set it to the most likely tag
-            # if tokens[observation] not in words:
-            #     trellis.loc[tokens[observation], state] = trellis.loc[tokens[observation-1], 'NNP'] * transition_matrix.loc['NNP', state]
-            #     backpointer.loc[state, tokens[observation]] = 'NNP'
-            # else:
-            trellis.loc[tokens[observation], state] = max([trellis.loc[tokens[observation-1], prev_state] * transition_matrix.loc[prev_state, state] * emission_matrix.loc[tokens[observation], state] for prev_state in parts_of_speech])
-            backpointer.loc[tokens[observation], state] = np.argmax([trellis.loc[tokens[observation-1], prev_state] * transition_matrix.loc[prev_state, state] * emission_matrix.loc[tokens[observation], state] for prev_state in parts_of_speech])
+            if token in words:
+                trellis[state][token] = transition_matrix[state]['.'] * emission_matrix[state][token]
+            else:
+                trellis[state][token] = transition_matrix[state]['.'] * emission_matrix[state]['<UNK>']
+            backpointer[state][token] = '.'
+
+    # viterbi is confusing
 
 
 
-    # backtrace
-    best_path = []
-    best_path.append(max([state for state in parts_of_speech], key=lambda state: trellis.loc[tokens[-1], state]))
-    for observation in range(len(tokens)-1, 0, -1):
-        best_path.append(backpointer.loc[best_path[-1], tokens[observation]])
-    best_path.reverse()
-    return list(zip(best_path, [0 for _ in range(len(best_path))]))
+
+
 
 
 
