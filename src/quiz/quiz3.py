@@ -173,7 +173,7 @@ def predict(tokens: List[str], *args) -> List[Tuple[str, float]]:
             if token in words:
                 trellis[state][token] = transition_matrix[state]['.'] * emission_matrix[state][token]
             else:
-                trellis[state][token] = transition_matrix[state]['.'] * emission_matrix[state]['<UNK>']
+                trellis[state][token] = transition_matrix[state]['.'] * emission_matrix[state]['NNP']
             backpointer[state][token] = '.'
 
     # viterbi is confusing
